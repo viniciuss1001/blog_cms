@@ -3,6 +3,6 @@ export const intl = {
 	defaultLocale: 'pt-BR',
 	localeList: [
 		{ locale: 'pt-BR', label: 'Português' },
-		{ locale: 'en-US', label: 'Inglês' }
+		{ locale: 'en-US', label: 'English' }
 	]
 }
