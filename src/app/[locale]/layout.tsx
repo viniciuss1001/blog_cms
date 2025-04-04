@@ -6,7 +6,7 @@ import {notFound} from 'next/navigation';
 import {routing} from '@/i18n/routing';
 
 export const metadata: Metadata = {
-    title: { template: "%s | GRF Blog", default: "Home | GRF Blog" },
+    title: { template: "%s | CMS Blog", default: "Home | CMS Blog" },
 };
 
 export default async function LocaleLayout({
