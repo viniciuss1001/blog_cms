@@ -50,7 +50,7 @@ export const getBlogPost = async ({ blogSlug, postSlug }: getBlogPostProps) => {
 		}
 
 	})
-	return { data: postMessage }
+	return { data: post }
 }
 
 

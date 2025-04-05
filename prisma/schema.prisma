@@ -100,7 +100,7 @@ model BlogUser {
 model Post {
   id        String    @id @default(cuid())
   title     String    @db.VarChar(100)
-  subTitle  String    @db.VarChar(100)
+  subtitle  String    @db.VarChar(100)
   slug      String    @db.VarChar(60)
   body      String    @db.Text
   blog      Blog      @relation(fields: [blogId], references: [id])
