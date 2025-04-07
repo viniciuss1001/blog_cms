@@ -14,10 +14,10 @@ type FieldType = {
 	name: string
 }
 
-const SignUpPage = () => {
+const SignUp = () => {
 	const signUpTranslations = useTranslations('SignUpPage')
 	const formTranslations = useTranslations('Form')
-	const commomTranslations = useTranslations('Commom')
+	const commomTranslations = useTranslations('Common')
 	const errorsTranslations = useTranslations('Errors')
 
 	const [loading, setLoading] = useState<boolean>(false)
@@ -59,6 +59,7 @@ const SignUpPage = () => {
 						name='name'
 						rules={[{ required: true, max: 70 }]}
 						required
+						className='dark:text-zinc-200'
 					>
 						<Input placeholder='name example' />
 					</Form.Item>
@@ -67,6 +68,7 @@ const SignUpPage = () => {
 						name='email'
 						rules={[{ required: true, max: 50}]}
 						required
+						className='dark:text-zinc-200'
 					>
 						<Input placeholder='example@example.com' />
 					</Form.Item>
@@ -95,7 +97,7 @@ const SignUpPage = () => {
 						{signUpTranslations('btn_label', { provider: 'Facebook' })}
 					</Button>
 
-					<p className='mt-7 text-center'>
+					<p className='mt-7 text-center dark:text-zinc-200'>
 						{signUpTranslations('already_have_account')}
 						<Link href='/auth/signin'
 							className='text-blue-500 ml-1'
@@ -109,4 +111,4 @@ const SignUpPage = () => {
 	)
 }
 
-export default SignUpPage
+export default SignUp

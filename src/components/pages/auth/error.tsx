@@ -5,7 +5,7 @@ import { WarningFilled } from "@ant-design/icons"
 import { Button, Result, theme } from "antd"
 import { useTranslations } from "next-intl"
 
-const VerifyEmail = () => {
+const AuthError = () => {
 
 	const { token: { red5 } } = theme.useToken()
 
@@ -35,4 +35,4 @@ const VerifyEmail = () => {
 	)
 }
 
-export default VerifyEmail
+export default AuthError

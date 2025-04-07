@@ -30,7 +30,7 @@ const NewBlogPost = ({ open, setOpen }: Props) => {
 
 	const newPostTranslations = useTranslations('NewBlog')
 	const formTranslations = useTranslations('Form')
-	const commomTranslations = useTranslations('Commom')
+	const commomTranslations = useTranslations('Common')
 	const errorsTranslations = useTranslations('Errors')
 
 	const locale = useLocale()

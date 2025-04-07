@@ -18,7 +18,7 @@
         "manage": "Gerenciar"
     },
     "HomePage": {
-        "title": "👋 Olá, !",
+        "title": "👋 Olá!",
         "description": "Selecione um blog para começar a gerenciar ou crie um novo.",
         "btn_label": "Criar blog",
         "tooltip_title": "Clique para selecionar"
