@@ -18,7 +18,7 @@ import { createBlog } from '@/server/admin/blogService'
 import { ThunderboltOutlined } from '@ant-design/icons'
 import { Button, Col, Drawer, Form, FormProps, Input, message, Row, Space, Spin, theme, Tooltip } from 'antd'
 import { useLocale, useTranslations } from 'next-intl'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 const NewBlog = ({ open, setOpen }: Props) => {
 
