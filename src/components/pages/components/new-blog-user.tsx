@@ -28,7 +28,7 @@ const NewBlogUser = ({ open, setOpen }: Props) => {
 
 	const NewBlogUserTranslations = useTranslations('NewBlogUser')
 	const formTranslations = useTranslations('Form')
-	const commomTranslations = useTranslations('Commom')
+	const commomTranslations = useTranslations('Common')
 	const errorsTranslations = useTranslations('Errors')
 
 	const onClose = () => {

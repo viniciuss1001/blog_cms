@@ -17,10 +17,10 @@ const VerifyEmail = () => {
 		<Result
 			status='info'
 			icon={< InfoCircleOutlined />}
-			style={{ color: colorPrimary }}
+			style={{ color: "white" }}
 			title={t('title')}
 			subTitle={'subtitle'}
-			className="max-w-3xl"
+			className="max-w-3xl dark:text-zinc-100"
 			extra={
 				<Link
 					href='/auth/signin'
@@ -30,6 +30,7 @@ const VerifyEmail = () => {
 					</Button>
 				</Link>
 			}
+			
 		/>
 
 	)

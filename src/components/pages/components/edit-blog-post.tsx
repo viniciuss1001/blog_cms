@@ -5,7 +5,7 @@ import { useAdminBlogStore } from '@/stores/blogAdminStore'
 import { PostWithUser } from '@/types/post'
 import { Col, Drawer, Form, FormProps, Input, message, Row, Spin } from 'antd'
 import { useTranslations } from 'next-intl'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import ReactQuill from 'react-quill'
 
 
@@ -30,7 +30,7 @@ const EditBlogPost = ({ open, defaultValues, onClose }: Props) => {
 
 	const editPostTranslations = useTranslations('EditBlogPost')
 	const formTranslations = useTranslations('Form')
-	const commomTranslations = useTranslations('Commom')
+	const commomTranslations = useTranslations('Common')
 	const errorsTranslations = useTranslations('Errors')
 
 

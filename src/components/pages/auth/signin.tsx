@@ -13,10 +13,10 @@ type FieldType = {
 	email: string
 }
 
-const SignInPage = () => {
+const SignIn = () => {
 	const signInTranslations = useTranslations('SignInPage')
 	const formTranslations = useTranslations('Form')
-	const commomTranslations = useTranslations('Commom')
+	const commomTranslations = useTranslations('Common')
 	const errorsTranslations = useTranslations('Errors')
 
 	const [loading, setLoading] = useState<boolean>(false)
@@ -54,6 +54,7 @@ const SignInPage = () => {
 					onFinish={onFinish}
 				>
 					<Form.Item
+						className='dark:text-zinc-200'
 						label={formTranslations('email_label')}
 						name='email'
 						rules={[{ required: true }]}
@@ -86,7 +87,7 @@ const SignInPage = () => {
 						{signInTranslations('btn_label', { provider: 'Facebook' })}
 					</Button>
 
-					<p className='mt-7 text-center'>
+					<p className='mt-7 text-center dark:text-zinc-200'>
 						{signInTranslations('no_account')}
 						<Link href='/auth/signup'
 						className='text-blue-500 ml-1'
@@ -100,4 +101,4 @@ const SignInPage = () => {
 	)
 }
 
-export default SignInPage
+export default SignIn
