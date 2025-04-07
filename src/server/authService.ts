@@ -34,7 +34,7 @@ export const signIn = async ({ data }: signInProps) => {
 type signUpProps = {
 	data: {
 		email: string
-		password: string
+		password?: string
 	}
 }
 
