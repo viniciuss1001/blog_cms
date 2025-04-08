@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📰 Blog CMS
 
-## Getting Started
+Um **sistema de gerenciamento de conteúdo (CMS)** para blogs, construído com **Next.js 15**, **React 19**, **Ant Design 5** e **Prisma ORM**.
 
-First, run the development server:
+Gerencie facilmente postagens, categorias e conteúdo usando uma interface intuitiva.
+
+---
+
+## ✨ Tecnologias Utilizadas
+
+- [Next.js 15](https://nextjs.org/)
+- [React 19](https://react.dev/)
+- [Ant Design 5](https://ant.design/)
+- [NextAuth.js 5](https://next-auth.js.org/)
+- [Prisma ORM](https://www.prisma.io/)
+- [MySQL](https://www.mysql.com/)
+- [React Quill](https://github.com/zenoamaro/react-quill) (Editor WYSIWYG)
+- [Zustand](https://github.com/pmndrs/zustand) (State Management)
+- [Next Intl](https://next-intl-docs.vercel.app/) (Internacionalização)
+- [Nodemailer](https://nodemailer.com/about/) (Envio de e-mails)
+
+---
+
+## ⚙️ Instalação e Configuração
+
+### 1. Clone o repositório
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/viniciuss1001/blog_cms.git
+cd blog-cms
 ```
+### 2. Instale dependências
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+pnpm install
+```
+### 3. Configure o ambiente
+- Crie um arquivo .env na raiz do projeto, e adicione as seguintes variáveis:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```env
+DATABASE_URL="mysql://usuario:senha@localhost:3306/nomedobanco"
+NEXTAUTH_SECRET="uma_chave_secreta_aleatória"
+NEXTAUTH_URL="http://localhost:3000"
+EMAIL_SERVER_USER="seu@email.com"
+EMAIL_SERVER_PASSWORD="sua-senha"
+EMAIL_SERVER_HOST="smtp.seuprovedor.com"
+EMAIL_SERVER_PORT=587
+EMAIL_FROM="seu@email.com"
+```
+### 4. Rode as migrações do banco de dados
+```bash
+pnpm prisma migrate dev
+```
+### 5. Inicie o servidor:
+```bash
+pnpm run dev 
+```
+## 🖥️ Funcionalidades
+- ✅ Cadastro e edição de posts
+- ✅ Editor de texto com suporte a formatação (React Quill)
+- ✅ Autenticação de usuários (NextAuth)
+- ✅ Interface totalmente responsiva e moderna (Ant Design)
+- ✅ Sistema de internacionalização (Next Intl)
+- ✅ Envio de e-mails com Nodemailer
+- ✅ Gerenciamento de estados globais com Zustand
