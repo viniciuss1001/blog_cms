@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react'
 import AdminHero from '../components/Admin-hero'
 import { Card, Col, Row, Statistic } from 'antd'
 
-const AdminDashboard = () => {
+const AdminDashboardPage = () => {
 
 	const { blogSelected } = useAdminBlogStore()
 	const { data } = useSession()
@@ -82,4 +82,4 @@ const AdminDashboard = () => {
 	)
 }
 
-export default AdminDashboard
+export default AdminDashboardPage

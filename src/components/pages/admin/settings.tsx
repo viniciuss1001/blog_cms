@@ -17,7 +17,7 @@ import React from 'react'
 import AdminHero from '../components/Admin-hero'
 import { hasPermission } from '@/lib/permissions'
 
-const AdminSettings = () => {
+const AdminSettingsPage = () => {
 	const [loading, setLoading] = React.useState(false)
 	const [form] = Form.useForm()
 
@@ -167,4 +167,4 @@ const AdminSettings = () => {
 	)
 }
 
-export default AdminSettings
+export default AdminSettingsPage

@@ -19,7 +19,7 @@ import NewBlogPost from "../components/new-blog-post"
 import EditBlogPost from "../components/edit-blog-post"
 import AdminHero from "../components/Admin-hero"
 
-const AdminPosts = ({ posts }: Props) => {
+const PostsPage = ({ posts }: Props) => {
 
 	const pageTranslations = useTranslations('PostsPage')
 	const formTranslations = useTranslations('Form')
@@ -140,4 +140,4 @@ const AdminPosts = ({ posts }: Props) => {
 	)
 }
 
-export default AdminPosts
+export default PostsPage

@@ -13,7 +13,7 @@ import { User } from "next-auth"
 import { useTranslations } from "next-intl"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import React, { Children, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import logo from '@/assets/images/shortLogo.svg'
 import LocaleDropDown from "./LocaleDropDown"
 import ToggleThemeComponent from "./toggle-theme"
@@ -62,14 +62,14 @@ const AdminLayoutComponent = ({ children, blog, user }: AdminLayoutProps) => {
 			key: '/admin/users',
 			icon: <UserOutlined />,
 			label: t('users'),
-			disabled: !hasPermission({ blogUser: blog.users, userId: user.id!, roles: ['OWNER', 'ADMIN'] }),
+			disabled: !hasPermission({ blogUsers: blog.users, userId: user.id!, roles: ['OWNER', 'ADMIN'] }),
 			onClick: () => router.push(`${blog.slug}/admin/users`)
 		},
 		{
 			key: '/admin/settings',
 			icon: <SettingOutlined />,
 			label: t('settings'),
-			disabled: !hasPermission({ blogUser: blog.users, userId: user.id!, roles: ['OWNER', 'ADMIN'] }),
+			disabled: !hasPermission({ blogUsers: blog.users, userId: user.id!, roles: ['OWNER', 'ADMIN'] }),
 			onClick: () => router.push(`${blog.slug}/admin/settings`)
 		}
 	]
@@ -131,7 +131,7 @@ const AdminLayoutComponent = ({ children, blog, user }: AdminLayoutProps) => {
 
 	useEffect(() => {
 		//check if user has permission to access the page
-		if ((formatedPathname.includes('/users') || formatedPathname.includes('/settings')) && !hasPermission({ blogUser: blog.users, userId: user.id!, roles: ['OWNER', 'ADMIN'] })) {
+		if ((formatedPathname.includes('/users') || formatedPathname.includes('/settings')) && !hasPermission({ blogUsers: blog.users, userId: user.id!, roles: ['OWNER', 'ADMIN'] })) {
 			router.replace(`/${blog.slug}/admin`)
 		} else {
 			setRestricted(false)

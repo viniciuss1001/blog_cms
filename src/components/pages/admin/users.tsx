@@ -20,7 +20,7 @@ type DataType = BlogUserWithUser & {
 	key: string
 }
 
-const AdminUsers = ({ users }: Props) => {
+const UsersPage = ({ users }: Props) => {
 
 	const pageTranslations = useTranslations('UsersPage')
 	const formTranslations = useTranslations('Form')
@@ -149,4 +149,4 @@ const AdminUsers = ({ users }: Props) => {
 	)
 }
 
-export default AdminUsers
+export default UsersPage
