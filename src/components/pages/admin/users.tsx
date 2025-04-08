@@ -128,7 +128,9 @@ const UsersPage = ({ users }: Props) => {
 					title={pageTranslations('title')}
 					description={pageTranslations('description')}
 					extra={
+						
 						<Button
+						
 							type="primary"
 							onClick={() => setNewBlogPostOpen(true)}
 						>

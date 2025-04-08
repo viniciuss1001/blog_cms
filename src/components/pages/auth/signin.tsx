@@ -18,7 +18,7 @@ const SignIn = () => {
 	const formTranslations = useTranslations('Form')
 	const commomTranslations = useTranslations('Common')
 	const errorsTranslations = useTranslations('Errors')
-
+	const [form] = Form.useForm()
 	const [loading, setLoading] = useState<boolean>(false)
 
 	const searchParams = useSearchParams()
@@ -50,6 +50,7 @@ const SignIn = () => {
 		<div className='border space-y-7 border-slate-100 dark:border-zinc-800 p-6 rounded-lg shadow w-full max-w-md'>
 			<Spin spinning={loading}>
 				<Form
+				form={form}
 					layout='vertical'
 					onFinish={onFinish}
 				>

@@ -12,7 +12,9 @@ type Props = {
 	}
 }
 
-const AdminUsers = async ({ params: { blog_slug } }: Props) => {
+const AdminUsers = async ({ params }: Props) => {
+
+	const { blog_slug } = params
 
 	const users = await getBlogUsers({ blogSlug: blog_slug })
 

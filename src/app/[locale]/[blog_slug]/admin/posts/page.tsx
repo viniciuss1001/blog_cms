@@ -12,13 +12,14 @@ type Props = {
 	}
 }
 
-const AdminPosts = async({ params: { blog_slug } }: Props) => {
+const AdminPosts = async ({ params: { blog_slug } }: Props) => {
 
-	const posts = await getBlogPosts({blogSlug: blog_slug})
+
+	const posts = await getBlogPosts({ blogSlug: blog_slug })
 
 	return (
 		<PostsPage
-		posts={posts.data!}
+			posts={posts.data!}
 		/>
 	)
 }

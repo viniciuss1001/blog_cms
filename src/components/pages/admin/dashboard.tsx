@@ -68,7 +68,7 @@ const AdminDashboardPage = () => {
 						<Col span={8}>
 							<Card>
 								<Statistic
-									title={t('your_total_post')}
+									title={t('your_total_posts')}
 									value={dashboardData?.totalPostsMadeByYou}
 									valueStyle={{ color: '#0572ff' }}
 									loading={loading}

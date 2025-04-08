@@ -47,10 +47,13 @@ const SignUp = () => {
 		}
 	}, [])
 
+	const [form] = Form.useForm()
+
 	return (
 		<div className='border space-y-7 border-slate-100 dark:border-zinc-800 p-6 rounded-lg shadow w-full max-w-md'>
 			<Spin spinning={loading}>
 				<Form
+				form={form}
 					layout='vertical'
 					onFinish={onFinish}
 				>

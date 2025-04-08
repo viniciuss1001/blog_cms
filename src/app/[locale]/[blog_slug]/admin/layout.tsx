@@ -1,8 +1,8 @@
 type Props = {
 	children: React.ReactNode
-	params: {
+	params: Promise<{
 		blog_slug: string
-	}
+	}>
 }
 
 import AdminLayoutComponent from '@/components/layout/Admin-layout'
@@ -13,7 +13,7 @@ import { notFound } from 'next/navigation'
 import React from 'react'
 
 const Layout = async ({ children, params }: Props) => {
-	const { blog_slug } = params
+	const { blog_slug } = await params
 	const session = await isAuthenticated()
 	const blog = await getBlog({ slug: blog_slug, user: session.user! })
 

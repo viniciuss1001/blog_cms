@@ -168,9 +168,9 @@ const NewBlog = ({ open, setOpen }: Props) => {
 								label={formTranslations('subtitle_label')}
 								rules={[{ max: 60 }]}
 							>
-								<Input.TextArea
+								{<Input.TextArea
 									showCount rows={4} maxLength={191}
-								/>
+								/>}
 							</Form.Item>
 						</Col>
 					</Row>

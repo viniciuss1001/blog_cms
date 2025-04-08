@@ -1,5 +1,5 @@
 "use client"
-
+import dynamic from 'next/dynamic'
 import { sendPromptToGemini } from '@/lib/gemini'
 import { createBlogPost } from '@/server/admin/blogPostServices'
 import { useAdminBlogStore } from '@/stores/blogAdminStore'
@@ -7,14 +7,13 @@ import { ThunderboltOutlined } from '@ant-design/icons'
 import { Button, Col, Drawer, Form, FormProps, Input, message, Row, Space, Spin, theme, Tooltip } from 'antd'
 import { useLocale, useTranslations } from 'next-intl'
 import React, { useEffect, useState } from 'react'
-import ReactQuill from 'react-quill'
 
+const ReactQuill = dynamic(() => import('react-quill'), {ssr: false})
 
 type Props = {
 	open: boolean
 	setOpen: (open: boolean) => void
 }
-
 
 type FieldType = {
 	title: string
@@ -30,7 +29,7 @@ const NewBlogPost = ({ open, setOpen }: Props) => {
 
 	const newPostTranslations = useTranslations('NewBlog')
 	const formTranslations = useTranslations('Form')
-	const commomTranslations = useTranslations('Common')
+	const commonTranslations = useTranslations('Common')
 	const errorsTranslations = useTranslations('Errors')
 
 	const locale = useLocale()
@@ -89,6 +88,7 @@ const NewBlogPost = ({ open, setOpen }: Props) => {
 				}
 			}}
 			extra={
+				
 				<Space>
 					<Tooltip
 						title={newPostTranslations('ai_tooltip')}
@@ -99,10 +99,10 @@ const NewBlogPost = ({ open, setOpen }: Props) => {
 						</Button>
 					</Tooltip>
 					<Button onClick={onClose}>
-						{commomTranslations('cancel')}
+						{commonTranslations('cancel')}
 					</Button>
 					<Button type='primary' onClick={form.submit} loading={loading}>
-						{commomTranslations('save')}
+						{commonTranslations('save')}
 					</Button>
 				</Space>
 			}

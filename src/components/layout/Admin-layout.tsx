@@ -10,7 +10,7 @@ import { Button, Layout, Menu, Select, Spin } from "antd"
 import { BreadcrumbItemType } from "antd/es/breadcrumb/Breadcrumb"
 import { Breadcrumb, MenuProps } from "antd/lib"
 import { User } from "next-auth"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import React, { useEffect, useState } from "react"
@@ -42,35 +42,36 @@ const AdminLayoutComponent = ({ children, blog, user }: AdminLayoutProps) => {
 	const formatedPathname = '/' + pathname.split('/').slice(2).join('/')
 
 	const handleChangeBlog = (slug: string) => {
-		router.replace(`/${slug}/${formatedPathname}`)
+		router.replace(`/${locale}/${slug}/${formatedPathname}`)
 	}
+	const locale = useLocale()
 
 	const menuItems: MenuProps['items'] = [
 		{
 			key: '/admin',
 			icon: <DashboardOutlined />,
 			label: "Dashboard",
-			onClick: () => router.push(`${blog.slug}/admin`)
+			onClick:() => router.push(`/${blog.slug}/admin`)
 		},
 		{
 			key: '/admin/posts',
 			icon: <FileTextOutlined />,
 			label: t('posts'),
-			onClick: () => router.push(`${blog.slug}/admin/posts`)
+			onClick: () => router.push(`/${blog.slug}/admin/posts`)
 		},
 		{
 			key: '/admin/users',
 			icon: <UserOutlined />,
 			label: t('users'),
 			disabled: !hasPermission({ blogUsers: blog.users, userId: user.id!, roles: ['OWNER', 'ADMIN'] }),
-			onClick: () => router.push(`${blog.slug}/admin/users`)
+			onClick: () => router.push(`/${blog.slug}/admin/users`)
 		},
 		{
 			key: '/admin/settings',
 			icon: <SettingOutlined />,
 			label: t('settings'),
 			disabled: !hasPermission({ blogUsers: blog.users, userId: user.id!, roles: ['OWNER', 'ADMIN'] }),
-			onClick: () => router.push(`${blog.slug}/admin/settings`)
+			onClick: () => router.push(`/${blog.slug}/admin/settings`)
 		}
 	]
 
@@ -137,6 +138,7 @@ const AdminLayoutComponent = ({ children, blog, user }: AdminLayoutProps) => {
 			setRestricted(false)
 		}
 	}, [blog, formatedPathname])
+
 
 	return (
 		<Layout className="h-screen overflow-hidden">
