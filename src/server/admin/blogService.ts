@@ -66,7 +66,6 @@ export const createBlog = async ({ data }: createBlogProps) => {
 type updateBlogProps = {
 	blogId: string
 	data: {
-		id: string,
 		title: string,
 		subtitle: string,
 		slug: string,
