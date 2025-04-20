@@ -2,10 +2,11 @@
 
 import { intl } from "@/config/intl"
 import { Link, usePathname } from "@/lib/navigation"
-import { CaretDownFilled } from "@ant-design/icons"
-import { Dropdown, Space } from "antd"
 import { useLocale } from "next-intl"
 import Image from "next/image"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import { Button } from "../ui/button"
+import { ChevronDown } from "lucide-react"
 
 const LocaleDropDown = () => {
 
@@ -13,28 +14,29 @@ const LocaleDropDown = () => {
 	const locale = useLocale()
 
 	return (
-		<Dropdown
-			menu={{
-				items: intl.localeList.map(data => {
-					return {
-						key: data.locale,
-						label: 
-						<Link href={pathname} locale={data.locale}>
-							{data.label}
-						</Link>,
-						icon: <Image src={`/imgs/${data.locale}.svg`} width={23} height={23} alt={data.locale}/>
-					}
-				}),
-				defaultSelectedKeys: [locale]
-			}}
-			trigger={['click']}
-
-		>
-			<Space className="border border-slate-200 dark:border-zinc-800 rounded-md h-9 px-3 cursor-pointer gap-4">
-				<Image src={`/imgs/${locale}.svg`} width={23} height={23} alt={locale} />
-				<CaretDownFilled classID="text-slate-600" />
-			</Space>
-		</Dropdown>
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button variant='outline' className="flex items-center gap-2 h-9 px-3">
+					<Image src={`/imgs/${locale}.svg`} width={23} height={23} alt={locale} />
+					<ChevronDown className="size-4 text-muted-foreground" />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end">
+				{intl.localeList.map(data => (
+					<DropdownMenuItem key={data.locale} asChild>
+						<Link href={pathname}
+							locale={data.locale}
+							className="flex items-center gap-2 w-full"
+						>
+							<Image src={`/imgs/${data.locale}.svg`} width={23} height={23} alt={data.locale} />
+							<span>
+								{data.label}
+							</span>
+						</Link>
+					</DropdownMenuItem>
+				))}
+			</DropdownMenuContent>
+		</DropdownMenu>
 	)
 }
 

@@ -9,6 +9,7 @@ import enUS from 'antd/locale/en_US';
 import ptBR from 'antd/locale/pt_BR';
 import 'react-quill/dist/quill.snow.css';
 import { useTheme } from "@/hooks/useTheme";
+import { ThemeProvider } from "@/components/layout/theme/theme-provider";
 
 const { defaultAlgorithm, darkAlgorithm } = antdTheme;
 
@@ -17,21 +18,22 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
 
     const locale = useLocale()
 
-    useEffect(() => {
-        getSavedTheme()
-    }, [])
-
     return (
         <StyleProvider layer>
             <AntdRegistry>
-                <ConfigProvider
-                    theme={{
-                        algorithm: theme === 'dark' ? darkAlgorithm : defaultAlgorithm
-                    }}
-                    locale={locale === 'pt-BR' ? ptBR : enUS}
-                >
-                    {children}
-                </ConfigProvider>
+                <ThemeProvider
+
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange>
+                    <ConfigProvider
+
+                        locale={locale === 'pt-BR' ? ptBR : enUS}
+                    >
+                        {children}
+                    </ConfigProvider>
+                </ThemeProvider>
             </AntdRegistry>
         </StyleProvider>
     )
