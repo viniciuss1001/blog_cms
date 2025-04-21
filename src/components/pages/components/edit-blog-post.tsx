@@ -1,12 +1,20 @@
 "use client"
 
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { updateBlogPost } from '@/server/admin/blogPostServices'
 import { useAdminBlogStore } from '@/stores/blogAdminStore'
 import { PostWithUser } from '@/types/post'
-import { Col, Drawer, Form, FormProps, Input, message, Row, Spin } from 'antd'
+import { zodResolver } from '@hookform/resolvers/zod'
+
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
+import { Form, useForm } from 'react-hook-form'
 import ReactQuill from 'react-quill'
+import { toast } from 'sonner'
+import { z } from 'zod'
 
 
 type Props = {
@@ -23,9 +31,26 @@ type FieldType = {
 	body: string
 }
 
+const formSchema = z.object({
+	title: z.string().min(1).max(60),
+	subtitle: z.string().max(191),
+	slug: z.string().min(1).max(60).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+	body: z.string()
+})
+
+type FormValues = z.infer<typeof formSchema>
+
 const EditBlogPost = ({ open, defaultValues, onClose }: Props) => {
+
+	const form = useForm<FormValues>({
+		resolver: zodResolver(formSchema),
+		defaultValues
+	})
+
+	const { handleSubmit, setValue, watch, reset } = form
+
 	const [loading, setLoading] = useState<boolean>(false)
-	const [form] = Form.useForm()
+
 	const { blogSelected } = useAdminBlogStore()
 
 	const editPostTranslations = useTranslations('EditBlogPost')
@@ -34,7 +59,7 @@ const EditBlogPost = ({ open, defaultValues, onClose }: Props) => {
 	const errorsTranslations = useTranslations('Errors')
 
 
-	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+	const onSubmit = async (values: FormValues) => {
 		if (!blogSelected) return
 
 		setLoading(true)
@@ -42,107 +67,106 @@ const EditBlogPost = ({ open, defaultValues, onClose }: Props) => {
 		setLoading(false)
 
 		if (blogPost?.error) {
-			message.error(errorsTranslations(`blog/${blogPost.error}`))
+			toast.error(errorsTranslations(`blog/${blogPost.error}`))
 		} else {
-			message.success(editPostTranslations('success'))
+			toast.success(editPostTranslations('success'))
 			onClose()
 		}
 	}
 
 	useEffect(() => {
-		form.resetFields()
-	}, [blogSelected])
+		reset(defaultValues)
+	}, [defaultValues, open, reset])
 
-	useEffect(() =>{
-		form.setFieldsValue(defaultValues)
-	},[defaultValues, open])
 
 	return (
-		<Drawer
-			title={editPostTranslations('title')}
-			width={520}
-			onClose={onClose}
-			open={open}
-			styles={{
-				body: {
-					paddingBottom: 80
-				}
-			}}
-	
-		>
-			<Spin spinning={loading}>
-				<Form
-					form={form}
-					layout='vertical'
-					requiredMark='optional'
-					onFinish={onFinish}
+		<Dialog open={open} onOpenChange={onClose}>
+			<DialogContent className='max-w-2xl'>
+				<DialogHeader>
+					<DialogTitle>
+						{editPostTranslations('title')}
+					</DialogTitle>
+				</DialogHeader>
 
-				>
-					<Row gutter={16}>
-						<Col span={24}>
-							<Form.Item<FieldType>
-								name='title'
-								label={formTranslations('title_label')}
-								rules={[{ required: true, max: 100 }]}
-							>
-								<Input
-									showCount
-									maxLength={100}
-									placeholder='Ex: Publicação '
-								/>
-							</Form.Item>
-						</Col>
-					</Row>
-					<Row>
-						<Col span={24}>
-							<Form.Item<FieldType>
-								name='subtitle'
-								label={formTranslations('subtitle_label')}
-								rules={[{ max: 60 }]}
-							>
-								<Input
-									showCount maxLength={191}
-									placeholder='Ex: Nome da nova publicação'
-								/>
-							</Form.Item>
-						</Col>
-					</Row>
-					<Row gutter={16}>
-						<Col span={24}>
-							<Form.Item<FieldType>
-								name='slug'
-								label={formTranslations('slug_label')}
-								rules={[{ required: true, max: 60, pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/ }]}
-							>
-								<Input
-									style={{ width: '100%' }}
-									showCount
-									maxLength={60}
-									addonBefore='/'
-									placeholder='Ex: Publicação'
-								/>
-							</Form.Item>
-						</Col>
-					</Row>
-					<Row gutter={16}>
-						<Col span={24}>
-							<Form.Item<FieldType>
-								name='body'
-								label={formTranslations('body_label')}
-								rules={[{ required: true }]}
-							>
-								<ReactQuill theme='show' value={form.getFieldValue('body')}
-									onChange={
-										(value) => form.setFieldsValue({ body: value })
-									}
-								/>
-							</Form.Item>
-						</Col>
-					</Row>
+				<Form {...form}>
+					<form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+						<FormField
+							control={form.control}
+							name='title'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>
+										{formTranslations('title_label')}
+									</FormLabel>
+									<FormControl>
+										<Input placeholder='Ex: Publicação' maxLength={100} {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="subtitle"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>{formTranslations('subtitle_label')}</FormLabel>
+									<FormControl>
+										<Input placeholder="Ex: Nome da nova publicação" maxLength={191} {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="slug"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>{formTranslations('slug_label')}</FormLabel>
+									<FormControl>
+										<div className="flex items-center space-x-2">
+											<span className="text-muted-foreground">/</span>
+											<Input placeholder="Ex: publicacao" maxLength={60} {...field} />
+										</div>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="body"
+							render={() => (
+								<FormItem>
+									<FormLabel>{formTranslations('body_label')}</FormLabel>
+									<FormControl>
+										<ReactQuill
+											theme="snow"
+											value={watch('body')}
+											onChange={(value) => setValue('body', value)}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<div className='flex justify-end gap-2 pt-4'>
+							<Button type='button' variant='outline' onClick={onClose}>
+								{commomTranslations('cancel')}
+							</Button>
+							<Button type='submit' disabled={loading}>
+								{commomTranslations('save')}
+							</Button>
+						</div>
+
+					</form>
 				</Form>
-			</Spin>
 
-		</Drawer>
+			</DialogContent>
+		</Dialog>
 	)
 }
 
