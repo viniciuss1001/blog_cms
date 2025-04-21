@@ -1,14 +1,23 @@
 "use client"
 
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { updateBlogPost } from '@/server/admin/blogPostServices'
 import { createBlogUser } from '@/server/admin/blogUserService'
 import { useAdminBlogStore } from '@/stores/blogAdminStore'
 import { PostWithUser } from '@/types/post'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { BlogUser } from '@prisma/client'
-import { Col, Drawer, Form, FormProps, Input, message, Row, Select, Spin } from 'antd'
+import { Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import React, { useEffect, useState } from 'react'
+import { Form, useForm } from 'react-hook-form'
 import ReactQuill from 'react-quill'
+import { toast } from 'sonner'
+import { z } from 'zod'
 
 
 type Props = {
@@ -21,9 +30,25 @@ type FieldType = {
 	role: BlogUser['role']
 }
 
+const formSchema = z.object({
+	email: z.string().email().max(191),
+	role: z.enum(['ADMIN', 'AUTHOR', 'EDITOR'])
+})
+
+type FormValues = z.infer<typeof formSchema>
+
 const NewBlogUser = ({ open, setOpen }: Props) => {
+
+	const form = useForm<FormValues>({
+		resolver: zodResolver(formSchema),
+		defaultValues: {
+			email: '',
+			role: 'AUTHOR'
+		}
+	})
+
 	const [loading, setLoading] = useState<boolean>(false)
-	const [form] = Form.useForm()
+
 	const { blogSelected } = useAdminBlogStore()
 
 	const NewBlogUserTranslations = useTranslations('NewBlogUser')
@@ -35,85 +60,89 @@ const NewBlogUser = ({ open, setOpen }: Props) => {
 		setOpen(false)
 	}
 
-	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+	const onSubmit = async (values: FormValues) => {
 		if (!blogSelected) return
 
 		setLoading(true)
-		const blogUser = await createBlogUser({ data: {...values, blogId: blogSelected.id} })
+		const blogUser = await createBlogUser({ data: { ...values, blogId: blogSelected.id } })
 		setLoading(false)
 
 		if (blogUser?.error) {
-			message.error(errorsTranslations(`blog/${blogUser.error}`))
+			toast.error(errorsTranslations(`blog/${blogUser.error}`))
 		} else {
-			message.success(NewBlogUserTranslations('success'))
+			toast.success(NewBlogUserTranslations('success'))
+			form.reset()
 			setOpen(false)
 		}
+
 	}
 
 	useEffect(() => {
-		form.resetFields()
+		form.reset()
 	}, [blogSelected])
 
-	
+
 	return (
-		<Drawer
-			title={NewBlogUserTranslations('title')}
-			width={520}
-			onClose={onClose}
-			open={open}
-			styles={{
-				body: {
-					paddingBottom: 80
-				}
-			}}
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogContent className='max-w-md'>
+				<DialogHeader>
+					<DialogTitle>
+						{NewBlogUserTranslations('title')}
+					</DialogTitle>
+				</DialogHeader>
 
-		>
-			<Spin spinning={loading}>
-				<Form
-					form={form}
-					layout='vertical'
-					requiredMark='optional'
-					onFinish={onFinish}
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+						<FormField
+							control={form.control}
+							name='email'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>
+										{formTranslations('user_email_label')}
+									</FormLabel>
+									<FormControl>
+										<Input placeholder='email@example.com' {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-				>
-					<Row gutter={16}>
-						<Col span={24}>
-							<Form.Item<FieldType>
-								name='email'
-								label={formTranslations('user_email_label')}
-								rules={[{ required: true, max: 191 }]}
-							>
-								<Input
-									showCount
-									maxLength={191}
-									placeholder='Ex: email@example.com '
-								/>
-							</Form.Item>
-						</Col>
-					</Row>
-					<Row>
-						<Col span={24}>
-							<Form.Item<FieldType>
-								name='role'
-								label={formTranslations('role_label')}
-								rules={[{ required: true }]}
-							>
-								<Select 
-								placeholder="Escolher cargo."
-								options={[
-									{value: 'ADMIN', label: commomTranslations('admin')},
-									{value: 'AUTHOR', label: commomTranslations('author')},
-									{value: 'EDITOR', label: commomTranslations('editor')},
-								]}
-								/>
-
-							</Form.Item>
-						</Col>
-					</Row>
+						<FormField
+							control={form.control}
+							name='role'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>
+										{formTranslations('role_label')}
+									</FormLabel>
+									<FormControl>
+										<Select onValueChange={field.onChange} value={field.value}>
+											<SelectTrigger>
+												<SelectValue placeholder="Selecionar Cargo" />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="ADMIN">{commomTranslations('admin')}</SelectItem>
+												<SelectItem value="AUTHOR">{commomTranslations('author')}</SelectItem>
+												<SelectItem value="EDITOR">{commomTranslations('editor')}</SelectItem>
+											</SelectContent>
+										</Select>
+									</FormControl>
+								</FormItem>
+							)}
+						/>
+						<DialogFooter>
+							<Button type='submit' disabled={loading}>
+								{loading && <Loader2 className='animate-spin'/>}
+								{commomTranslations('save')}
+							</Button>
+						</DialogFooter>
+					</form>
 				</Form>
-			</Spin>
 
-		</Drawer>
+			</DialogContent>
+		</Dialog>
 	)
 }
 
