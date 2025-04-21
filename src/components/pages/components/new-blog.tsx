@@ -1,29 +1,56 @@
 "use client"
 
+import { Button } from '@/components/ui/button'
+import { Drawer, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
+import { Tooltip, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { sendPromptToGemini } from '@/lib/gemini'
+import { createBlog } from '@/server/admin/blogService'
+import { TooltipContent } from '@radix-ui/react-tooltip'
+import { Bolt, Loader2 } from 'lucide-react'
+
+import { useLocale, useTranslations } from 'next-intl'
+import { useState } from 'react'
+import { Form, useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+
 type Props = {
 	open: boolean
 	setOpen: (open: boolean) => void
 }
 
-type FieldType = {
-	title: string
-	subtitle: string
-	slug: string
-	bgColor: string
-	textColor: string
-}
-
-import { sendPromptToGemini } from '@/lib/gemini'
-import { createBlog } from '@/server/admin/blogService'
-import { ThunderboltOutlined } from '@ant-design/icons'
-import { Button, Col, Drawer, Form, FormProps, Input, message, Row, Space, Spin, theme, Tooltip } from 'antd'
-import { useLocale, useTranslations } from 'next-intl'
-import { useState } from 'react'
 
 const NewBlog = ({ open, setOpen }: Props) => {
 
+	const formSchema = z.object({
+		title: z.string().min(1).max(60),
+		subtitle: z.string().max(191),
+		slug: z.string().min(1).max(60).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+		bgColor: z.string().min(1),
+		textColor: z.string().min(1)
+
+	})
+
+	type FormValues = z.infer<typeof formSchema>
+
+	const form = useForm<FormValues>({
+		resolver: zodResolver(formSchema),
+		defaultValues: {
+			title: "",
+			subtitle: "",
+			slug: "",
+			bgColor: "#ffffff",
+			textColor: "#000000"
+		}
+	})
+
 	const [loading, setLoading] = useState<boolean>(false)
-	const [form] = Form.useForm()
+
 
 	const newBlogTranslations = useTranslations('NewBlog')
 	const formTranslations = useTranslations('Form')
@@ -31,7 +58,6 @@ const NewBlog = ({ open, setOpen }: Props) => {
 	const errorsTranslations = useTranslations('Errors')
 
 	const locale = useLocale()
-	const { token: { colorPrimary } } = theme.useToken()
 
 	const onClose = () => setOpen(false)
 
@@ -49,134 +75,157 @@ const NewBlog = ({ open, setOpen }: Props) => {
                 }
 				`
 		})
-		form.setFieldsValue(response)
+		if (response?.title && response?.subtitle && response?.slug) {
+			form.setValue('title', response.title)
+			form.setValue('subtitle', response.subtitle)
+			form.setValue('slug', response.slug)
+
+			toast.success('Conteúdo gerado com sucesso pela IA.')
+		}
 		setLoading(false)
 	}
 
-	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+	const onSubmit = async (values: FormValues) => {
 		setLoading(true)
 		const blog = await createBlog({ data: values })
 		setLoading(false)
 
 		if (blog?.error) {
-			message.error(errorsTranslations(`blog/${blog.error}`))
+			toast.error(errorsTranslations(`blog/${blog.error}`))
+		} else {
+			form.reset()
+			onClose()
+			toast.success(newBlogTranslations('created_successfully'))
 		}
 	}
 
 	return (
-		<Drawer
-			title={newBlogTranslations('title')}
-			width={720}
-			onClose={onClose}
-			open={open}
-			styles={{
-				body: {
-					paddingBottom: 80
-				}
-			}}
-			extra={
-				<Space>
-					<Tooltip
-						title={newBlogTranslations('ai_tooltip')}
-						className='mr-2'
-					>
-						<Button type='text' onClick={handleAIGenerate}>
-							<ThunderboltOutlined classID='text-xl' style={{ color: colorPrimary }} />
-						</Button>
-					</Tooltip>
-					<Button onClick={onClose}>
-						{commomTranslations('cancel')}
-					</Button>
-					<Button type='primary' onClick={form.submit} loading={loading}>
-						{commomTranslations('save')}
-					</Button>
-				</Space>
-			}
-		>
-			<Spin spinning={loading}>
-				<Form
-					form={form}
-					layout='vertical'
-					requiredMark='optional'
-					onFinish={onFinish}
-					initialValues={{
-						bgColor: '#ffffff',
-						textColor: '#000000'
-					}}
-				>
-					<Row gutter={16}>
-						<Col span={12}>
-							<Form.Item<FieldType>
-								name='title'
-								label={formTranslations('title_label')}
-								rules={[{ required: true, max: 60 }]}
-							>
-								<Input
-									showCount
-									maxLength={60}
-								/>
-							</Form.Item>
-						</Col>
-						<Col span={12}>
-							<Form.Item<FieldType>
-								name='slug'
-								label={formTranslations('slug_label')}
-								rules={[{ required: true, max: 60, pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/ }]}
-							>
-								<Input
-									style={{ width: '100%' }}
-									showCount
-									maxLength={60}
-									addonBefore='/'
-									placeholder='Ex: meu-blog'
-								/>
-							</Form.Item>
-						</Col>
+		<Drawer open={open} onClose={onClose}>
+			<DrawerHeader>
+				<DrawerTitle>
+					{newBlogTranslations('title')}
+				</DrawerTitle>
+				<DrawerDescription>
+					{newBlogTranslations('description')}
+				</DrawerDescription>
+			</DrawerHeader>
 
-					</Row>
-					<Row gutter={16}>
-						<Col span={12}>
-							<Form.Item<FieldType>
-								name='bgColor'
-								label={formTranslations('bg_color_label')}
-								rules={[{ required: true, max: 60 }]}
-							>
-								<Input
-									style={{ width: '100%' }}
-									type='color'
+			<div className='px-6 py-2 max-h-[70vh] overflow-y-auto'>
+				{loading ? (
+					<Loader2 className='animate-spin' />
+				) : (
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onSubmit)}
+							className='grid gap-6'
+						>
+							<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+								<FormField
+									control={form.control}
+									name='title'
+									render={({ field }) => (
+										<FormItem>
+											<Label>
+												{formTranslations('title_label')}
+											</Label>
+											<FormControl>
+												<Input maxLength={60}  {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
 								/>
-							</Form.Item>
-						</Col>
-						<Col span={12}>
-							<Form.Item<FieldType>
-								name='textColor'
-								label={formTranslations('text_color_label')}
-								rules={[{ required: true, max: 60 }]}
-							>
-								<Input
-									style={{ width: '100%' }}
-									type='color'
-								/>
-							</Form.Item>
-						</Col>
 
-					</Row>
-					<Row gutter={16}>
-						<Col span={24}>
-							<Form.Item<FieldType>
+								<FormField
+									control={form.control}
+									name='slug'
+									render={({ field }) => (
+										<FormItem>
+											<Label>
+												{formTranslations("slug_label")}
+											</Label>
+											<FormControl>
+												<div className='flex items-center'>
+													<span className='mr-2 text-muted-foreground'>
+														/
+													</span>
+													<Input maxLength={60} placeholder='Ex: meu-blog' {...field} />
+												</div>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
+
+							<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+								<FormField
+									control={form.control}
+									name='bgColor'
+									render={({ field }) => (
+										<FormItem>
+											<Label>{formTranslations('bg_color_label')}</Label>
+											<FormControl>
+												<Input type="color" {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<FormField
+									control={form.control}
+									name='textColor'
+									render={({ field }) => (
+										<FormItem>
+											<Label>{formTranslations('text_color_label')}</Label>
+											<FormControl>
+												<Input type="color" {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
+
+							<FormField
+								control={form.control}
 								name='subtitle'
-								label={formTranslations('subtitle_label')}
-								rules={[{ max: 60 }]}
-							>
-								{<Input.TextArea
-									showCount rows={4} maxLength={191}
-								/>}
-							</Form.Item>
-						</Col>
-					</Row>
-				</Form>
-			</Spin>
+								render={({ field }) => (
+									<FormItem>
+										<Label>{formTranslations('subtitle_label')}</Label>
+										<FormControl>
+											<Textarea maxLength={191} rows={4} {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
+						</form>
+					</Form>
+				)}
+			</div>
+
+			<DrawerFooter className='flex flex-col gap-2 sm:flex-row sm:justify-end sm:gap-3 px-6 py-4 border-t'>
+				<TooltipProvider>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button variant='ghost' onClick={handleAIGenerate} className='text-xl'>
+								<Bolt className='size-5' />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent side='top'>
+							<p>{newBlogTranslations('ai_tooltip')}</p>
+						</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
+				<Button variant='outline' onClick={onClose}>
+					{commomTranslations('cancel')}
+				</Button>
+				<Button type='submit' disabled={loading}>
+					{commomTranslations('save')}
+				</Button>
+			</DrawerFooter>
 		</Drawer>
 	)
 }

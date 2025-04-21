@@ -5,6 +5,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { ThemeProvider } from "@/components/layout/theme/theme-provider";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: { template: "%s | CMS Blog", default: "Home | CMS Blog" },
@@ -28,6 +29,7 @@ export default async function LocaleLayout({
       <html lang={locale}>
         <body>
           <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          <Toaster />
         </body>
       </html>
     </ThemeProvider>
