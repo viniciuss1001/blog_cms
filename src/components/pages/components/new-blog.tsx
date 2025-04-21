@@ -13,10 +13,12 @@ type FieldType = {
 	textColor: string
 }
 
+import { Drawer, DrawerTitle } from '@/components/ui/drawer'
 import { sendPromptToGemini } from '@/lib/gemini'
 import { createBlog } from '@/server/admin/blogService'
 import { ThunderboltOutlined } from '@ant-design/icons'
-import { Button, Col, Drawer, Form, FormProps, Input, message, Row, Space, Spin, theme, Tooltip } from 'antd'
+import { Button, Col, Form, FormProps, Input, message, Row, Space, Spin, theme, Tooltip } from 'antd'
+import { Loader2 } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
@@ -65,35 +67,32 @@ const NewBlog = ({ open, setOpen }: Props) => {
 
 	return (
 		<Drawer
-			title={newBlogTranslations('title')}
-			width={720}
-			onClose={onClose}
-			open={open}
-			styles={{
-				body: {
-					paddingBottom: 80
-				}
-			}}
-			extra={
-				<Space>
-					<Tooltip
-						title={newBlogTranslations('ai_tooltip')}
-						className='mr-2'
-					>
-						<Button type='text' onClick={handleAIGenerate}>
-							<ThunderboltOutlined classID='text-xl' style={{ color: colorPrimary }} />
-						</Button>
-					</Tooltip>
-					<Button onClick={onClose}>
-						{commomTranslations('cancel')}
-					</Button>
-					<Button type='primary' onClick={form.submit} loading={loading}>
-						{commomTranslations('save')}
-					</Button>
-				</Space>
-			}
+		// extra={
+		// 	<Space>
+		// 		<Tooltip
+		// 			title={newBlogTranslations('ai_tooltip')}
+		// 			className='mr-2'
+		// 		>
+		// 			<Button type='text' onClick={handleAIGenerate}>
+		// 				<ThunderboltOutlined classID='text-xl' style={{ color: colorPrimary }} />
+		// 			</Button>
+		// 		</Tooltip>
+		// 		<Button onClick={onClose}>
+		// 			{commomTranslations('cancel')}
+		// 		</Button>
+		// 		<Button type='primary' onClick={form.submit} loading={loading}>
+		// 			{commomTranslations('save')}
+		// 		</Button>
+		// 	</Space>
+		// }
 		>
-			<Spin spinning={loading}>
+			<DrawerTitle>
+				title={newBlogTranslations('title')}
+			</DrawerTitle>
+
+			{loading ? <Loader2 className='w-full animate-spin' /> : (
+
+
 				<Form
 					form={form}
 					layout='vertical'
@@ -175,7 +174,7 @@ const NewBlog = ({ open, setOpen }: Props) => {
 						</Col>
 					</Row>
 				</Form>
-			</Spin>
+			)}
 
 		</Drawer>
 	)
