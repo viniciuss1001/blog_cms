@@ -4,11 +4,18 @@ import { sendPromptToGemini } from '@/lib/gemini'
 import { createBlogPost } from '@/server/admin/blogPostServices'
 import { useAdminBlogStore } from '@/stores/blogAdminStore'
 import { ThunderboltOutlined } from '@ant-design/icons'
-import { Button, Col, Drawer, Form, FormProps, Input, message, Row, Space, Spin, theme, Tooltip } from 'antd'
 import { useLocale, useTranslations } from 'next-intl'
 import React, { useEffect, useState } from 'react'
+import { Form, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Button } from '@/components/ui/button'
+import { Bolt } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 
-const ReactQuill = dynamic(() => import('react-quill'), {ssr: false})
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 type Props = {
 	open: boolean
@@ -23,8 +30,12 @@ type FieldType = {
 }
 
 const NewBlogPost = ({ open, setOpen }: Props) => {
+
+	const { register, handleSubmit, setValue, reset, watch,
+		formState: { errors, isSubmitting }
+	} = useForm<FieldType>()
+
 	const [loading, setLoading] = useState<boolean>(false)
-	const [form] = Form.useForm()
 	const { blogSelected } = useAdminBlogStore()
 
 	const newPostTranslations = useTranslations('NewBlog')
@@ -33,7 +44,6 @@ const NewBlogPost = ({ open, setOpen }: Props) => {
 	const errorsTranslations = useTranslations('Errors')
 
 	const locale = useLocale()
-	const { token: { colorPrimary } } = theme.useToken()
 
 	const onClose = () => setOpen(false)
 
@@ -52,11 +62,18 @@ const NewBlogPost = ({ open, setOpen }: Props) => {
                 }
 				`
 		})
-		form.setFieldsValue(response)
-		setLoading(false)
+		if (response?.title && response?.body && response?.slug) {
+			setValue('title', response.title)
+			setValue('subtitle', response.subtitle)
+			setValue('slug', response.slug)
+			setValue('body', response.body)
+			toast.success(newPostTranslations('ai_filled_success'))
+		} else {
+			toast.warning(newPostTranslations('ai_filled_error'))
+		}
 	}
 
-	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+	const onSubmit = async (values: FieldType) => {
 		if (!blogSelected) return
 
 		setLoading(true)
@@ -64,121 +81,103 @@ const NewBlogPost = ({ open, setOpen }: Props) => {
 		setLoading(false)
 
 		if (blogPost?.error) {
-			message.error(errorsTranslations(`blog/${blogPost.error}`))
+			toast.error(errorsTranslations(`blog/${blogPost.error}`))
 		} else {
-			message.success(newPostTranslations('success'))
+			toast.success(newPostTranslations('success'))
+			reset()
 			setOpen(false)
 		}
 	}
 
-	useEffect(() => {
-		form.resetFields()
-	}, [blogSelected])
-
 
 	return (
-		<Drawer
-			title={newPostTranslations('title')}
-			width={600}
-			onClose={onClose}
-			open={open}
-			styles={{
-				body: {
-					paddingBottom: 80
-				}
-			}}
-			extra={
-				
-				<Space>
-					<Tooltip
-						title={newPostTranslations('ai_tooltip')}
-						className='mr-2'
-					>
-						<Button type='text' onClick={handleAIGenerate}>
-							<ThunderboltOutlined classID='text-xl' style={{ color: colorPrimary }} />
-						</Button>
-					</Tooltip>
-					<Button onClick={onClose}>
-						{commonTranslations('cancel')}
-					</Button>
-					<Button type='primary' onClick={form.submit} loading={loading}>
-						{commonTranslations('save')}
-					</Button>
-				</Space>
-			}
-		>
-			<Spin spinning={loading}>
-				<Form
-					form={form}
-					layout='vertical'
-					requiredMark='optional'
-					onFinish={onFinish}
+		<Drawer open={open} onOpenChange={setOpen}>
+			<DrawerContent className='max-w-2xl mx-auto'>
+				<DrawerHeader>
+					<DrawerTitle>
+						{newPostTranslations('title')}
+					</DrawerTitle>
+				</DrawerHeader>
 
-				>
-					<Row gutter={16}>
-						<Col span={24}>
-							<Form.Item<FieldType>
-								name='title'
-								label={formTranslations('title_label')}
-								rules={[{ required: true, max: 100 }]}
-							>
-								<Input
-									showCount
-									maxLength={100}
-									placeholder='Ex: Publicação '
-								/>
-							</Form.Item>
-						</Col>
-					</Row>
-					<Row>
-						<Col span={24}>
-							<Form.Item<FieldType>
-								name='subtitle'
-								label={formTranslations('subtitle_label')}
-								rules={[{ max: 60 }]}
-							>
-								<Input
-									showCount maxLength={191}
-									placeholder='Ex: Nome da nova publicação'
-								/>
-							</Form.Item>
-						</Col>
-					</Row>
-					<Row gutter={16}>
-						<Col span={24}>
-							<Form.Item<FieldType>
-								name='slug'
-								label={formTranslations('slug_label')}
-								rules={[{ required: true, max: 60, pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/ }]}
-							>
-								<Input
-									style={{ width: '100%' }}
-									showCount
-									maxLength={60}
-									addonBefore='/'
-									placeholder='Ex: Publicação'
-								/>
-							</Form.Item>
-						</Col>
-					</Row>
-					<Row gutter={16}>
-						<Col span={24}>
-							<Form.Item<FieldType>
-								name='body'
-								label={formTranslations('body_label')}
-								rules={[{ required: true }]}
-							>
-								<ReactQuill theme='show' value={form.getFieldValue('body')}
-									onChange={
-										(value) => form.setFieldsValue({ body: value })
-									}
-								/>
-							</Form.Item>
-						</Col>
-					</Row>
-				</Form>
-			</Spin>
+				<form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+					<div>
+						<Label htmlFor='title'>
+							{formTranslations('title')}
+						</Label>
+						<Input
+							id='title'
+							{...register("title", { required: true, maxLength: 100 })}
+							placeholder='Ex: Nova Publicação'
+						/>
+						{errors.title && <p className='text-xs text-red-500'>Campo obrigatório</p>}
+					</div>
+					<div>
+						<Label htmlFor='subtitle'>{formTranslations('subtitle_label')}</Label>
+						<Input
+							id='subtitle'
+							{...register('subtitle', { maxLength: 191 })}
+							placeholder='Ex: Nome da nova publicação'
+						/>
+					</div>
+					<div>
+						<Label htmlFor='slug'>{formTranslations('slug_label')}</Label>
+						<Input
+							id='slug'
+							{...register('slug', {
+								required: true,
+								pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+								maxLength: 60,
+							})}
+							placeholder='Ex: publicacao-nova'
+						/>
+						{errors.slug && <p className="text-sm text-red-500">Slug inválido</p>}
+					</div>
+					<div>
+						<Label>{formTranslations('body_label')}</Label>
+						<ReactQuill
+							theme='snow'
+							value={watch('body')}
+							onChange={(value) => setValue('body', value)}
+						/>
+					</div>
+				</form>
 
+				<DrawerFooter>
+					<div className='flex justify-between w-full'>
+						<div className='flex gap-2'>
+							<TooltipProvider>
+
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											variant='ghost'
+											type='button'
+											onClick={handleAIGenerate}
+											disabled={isSubmitting}
+										>
+											<Bolt />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>
+										{newPostTranslations("ai_tooltip")}
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						</div>
+
+						<div className='flex gap-2'>
+							<DrawerClose asChild>
+								<Button variant='outline' type='button'>
+									{commonTranslations('cancel')}
+								</Button>
+							</DrawerClose>
+							<Button type='submit' disabled={isSubmitting}>
+								{commonTranslations('save')}
+							</Button>
+						</div>
+					</div>
+				</DrawerFooter>
+			</DrawerContent>
 		</Drawer>
 	)
 }

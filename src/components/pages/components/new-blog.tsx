@@ -51,7 +51,6 @@ const NewBlog = ({ open, setOpen }: Props) => {
 
 	const [loading, setLoading] = useState<boolean>(false)
 
-
 	const newBlogTranslations = useTranslations('NewBlog')
 	const formTranslations = useTranslations('Form')
 	const commomTranslations = useTranslations('Common')
