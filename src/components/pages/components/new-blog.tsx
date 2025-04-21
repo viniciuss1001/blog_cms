@@ -100,6 +100,7 @@ const NewBlog = ({ open, setOpen }: Props) => {
 	}
 
 	return (
+
 		<Drawer open={open} onClose={onClose}>
 			<DrawerHeader>
 				<DrawerTitle>
@@ -133,6 +134,7 @@ const NewBlog = ({ open, setOpen }: Props) => {
 											<FormMessage />
 										</FormItem>
 									)}
+
 								/>
 
 								<FormField
@@ -190,6 +192,7 @@ const NewBlog = ({ open, setOpen }: Props) => {
 							<FormField
 								control={form.control}
 								name='subtitle'
+
 								render={({ field }) => (
 									<FormItem>
 										<Label>{formTranslations('subtitle_label')}</Label>
@@ -226,6 +229,7 @@ const NewBlog = ({ open, setOpen }: Props) => {
 					{commomTranslations('save')}
 				</Button>
 			</DrawerFooter>
+
 		</Drawer>
 	)
 }
